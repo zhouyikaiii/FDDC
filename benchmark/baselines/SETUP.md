@@ -78,9 +78,11 @@ Humanoid-GPT / MOSAIC / SONIC use `runs`; HoloMotion uses `runm`. Confirm the ou
 > `OMNI_SEED` is bit-reproducible, but OmniXtreme is a flow model whose `initial_noise` sample decides a
 > handful of borderline clips: **Perfect is a deterministic 0 / 90** (it never holds single-leg), while the
 > Marginal / Failure split shifts a few clips across seeds/runs (with the consistent-metrics scoring,
-> observed **0.0 / 2.2–10.0 / 90.0–97.8** over `OMNI_SEED=0,1,2`; earlier runs gave 5.6/94.4, 4.4/95.6,
-> 3.3/96.7). The paper reports **0.0 / 3.3 / 96.7** as one fixed-seed sample; no single seed reproduces it
-> exactly. Set `OMNI_SEED=<n>` for a different fixed draw, or `OMNI_CLEAN=0` for the upstream noisy config.
+> observed **0.0 / 2.2–10.0 / 90.0–97.8** over `OMNI_SEED=0,1,2`; and, because the upstream flow draws are
+> not fully seeded, it also drifts run-to-run at a fixed seed — the continuous metrics, e.g. MoS, drift with
+> it since they follow OmniXtreme's own trajectory). The paper reports the default-seed (`OMNI_SEED` unset)
+> sample **0.0 / 6.7 / 93.3**; treat it as one sample, not an exact target. Set `OMNI_SEED=<n>` for a
+> different fixed draw, or `OMNI_CLEAN=0` for the upstream noisy config.
 
 > **Humanoid-GPT** (targets the Humanoid-GPT version used in the paper). The adapter now **self-handles**
 > the two upstream quirks below, so no manual `cd` or source edit is needed — you only set
@@ -185,7 +187,7 @@ PY
 | Baseline | Perfect | Marginal | Failure |
 |----------|:-------:|:--------:|:-------:|
 | ProtoMotions | 0.0 | 51.1 | 48.9 |
-| OmniXtreme   | 0.0 | 3.3† | 96.7 |
+| OmniXtreme   | 0.0 | 6.7† | 93.3 |
 | GMT          | 0.0 | 18.9 | 81.1 |
 | MOSAIC       | 0.0 | 66.7 | 33.3 |
 | TWIST        | 0.0 | 47.8 | 52.2 |
