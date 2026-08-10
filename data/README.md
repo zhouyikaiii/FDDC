@@ -9,7 +9,7 @@ not in this git repo (they are ~645 MB). Only the small metadata
 **Get the motions:**
 
 ```bash
-pip install huggingface_hub
+pip install huggingface_hub socksio   # socksio only needed behind a SOCKS proxy (ALL_PROXY=socks5://...)
 python download_data.py        # from the repo root -> fills data/data_stratified_900/{train,val,test}/
 ```
 

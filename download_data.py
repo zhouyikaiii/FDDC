@@ -3,7 +3,7 @@
 
 The motion .npz are hosted on the HuggingFace Hub (not in git). Run this once before the benchmark:
 
-    pip install huggingface_hub
+    pip install huggingface_hub socksio   # socksio only needed behind a SOCKS proxy (ALL_PROXY=socks5://...)
     python download_data.py
 
 Override the source repo with the DDC_HF_REPO env var if you mirror the dataset elsewhere.

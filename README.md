@@ -75,7 +75,7 @@ correlated HuB IMU-orientation drift — averaged over `K=10` fixed seeds).
 
 ```bash
 # 0. fetch the motion clips from HuggingFace (not in git; ~645 MB) -> data/data_stratified_900/
-pip install huggingface_hub
+pip install huggingface_hub socksio   # socksio only needed if you download via a SOCKS proxy (e.g. ALL_PROXY=socks5://...)
 python download_data.py
 
 # 1. environment (CPU is fine; a CPU-only torch build works)
