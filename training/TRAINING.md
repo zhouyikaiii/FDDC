@@ -60,10 +60,13 @@ over the same paths manually.)
 # reproduce the deployed policy — 2x RTX 3090 (paper Table 6): 2 GPUs, 8192 total envs (4096/GPU), 400k iters.
 # The deployed checkpoint model_0262000.pt is step 262k, selected on the val split (not the final iter).
 CUDA_VISIBLE_DEVICES=0,1 NUM_ENVS=8192 ITERS=400000 \
-    DATA=/path/to/data_stratified_900/train bash train_full.sh
+    HOLOSOMA_ROOT=/path/to/holosoma-checkout DATA=/path/to/data_stratified_900/train \
+    bash train_full.sh
 ```
 
-which runs (see `train_full.sh` for the overridable knobs):
+`HOLOSOMA_ROOT` must point at the Holosoma checkout you overlaid the DDC files onto in step 3 — the script
+`cd`s there (the framework `train_agent.py` is not vendored in this release) and runs (from `$HOLOSOMA_ROOT`,
+see `train_full.sh` for the overridable knobs):
 
 ```bash
 torchrun --standalone --nproc_per_node=2 src/holosoma/holosoma/train_agent.py \

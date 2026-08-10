@@ -20,7 +20,14 @@ NUM_ENVS=${NUM_ENVS:-8192}             # global total (paper Table 6); split acr
 BUFFER=${BUFFER:-384}                   # replay-buffer capacity used by the released policy; override via env
 DATA=${DATA:-/path/to/data_stratified_900/train}   # motion dir = the released DDC training set; override via env
 
-cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"   # cd to the script's repo root; survives rename/move
+# The framework entry point (src/holosoma/holosoma/train_agent.py) lives in YOUR Holosoma checkout, not in
+# this release (Holosoma is not vendored here — see TRAINING.md). Point HOLOSOMA_ROOT at that checkout AFTER
+# overlaying the DDC files with apply_ddc_to_holosoma.sh, and run from there.
+HOLOSOMA_ROOT=${HOLOSOMA_ROOT:?set HOLOSOMA_ROOT to your Holosoma checkout with fddc_src applied (see TRAINING.md)}
+cd "$HOLOSOMA_ROOT"
+[ -f src/holosoma/holosoma/train_agent.py ] || {
+    echo "ERROR: src/holosoma/holosoma/train_agent.py not found under HOLOSOMA_ROOT=$HOLOSOMA_ROOT"
+    echo "       — is it a Holosoma checkout with fddc_src applied (apply_ddc_to_holosoma.sh)?"; exit 1; }
 MC=--command.setup_terms.motion_command.params.motion_config
 TORCHRUN=${TORCHRUN:-torchrun}  # torchrun from the activated training env (hssim)
 
