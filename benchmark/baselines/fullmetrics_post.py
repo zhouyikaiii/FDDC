@@ -11,6 +11,16 @@ MK = ["success", "success_sustained", "track_fail", "fell", "hop_count", "swing_
 def _xyzw(q):
     return np.array([q[1], q[2], q[3], q[0]])
 
+def _foot_fz(model, data, bid):
+    """Normal contact force on the foot body's geoms at the CURRENT (mj_forward'd) state — the same helper
+    the omni/hgpt adapters used to record fz, re-evaluated on a state consistent with the recorded qpos."""
+    tot = 0.0; f = np.zeros(6)
+    for i in range(data.ncon):
+        c = data.contact[i]
+        if bid == model.geom_bodyid[c.geom1] or bid == model.geom_bodyid[c.geom2]:
+            mujoco.mj_contactForce(model, data, i, f); tot += abs(float(f[0]))
+    return tot
+
 def compute(qpos_traj, qvel_traj, fz_traj, model, mid, nom_h, HZ):
     T = len(qpos_traj)
     lf = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, "left_ankle_roll_link")
@@ -25,7 +35,13 @@ def compute(qpos_traj, qvel_traj, fz_traj, model, mid, nom_h, HZ):
     prev_com = None; fell = False
     for t in range(T):
         q = qpos_traj[t]
-        d.qpos[:len(q)] = q; mujoco.mj_kinematics(model, d); mujoco.mj_comPos(model, d)
+        d.qpos[:len(q)] = q
+        if qvel_traj is not None: d.qvel[:len(qvel_traj[t])] = qvel_traj[t]
+        # Full forward (kinematics + comPos + CONTACT solve) at the recorded qpos/qvel, so the contact
+        # forces driving hop/touchdown are consistent with qpos. mj_step leaves them one substep stale in
+        # the recorded fz; this is the metrics-side consistency fix (same as G1Sim.pd_step / gmt / twist).
+        # The baseline's own deploy loop (deploy_mujoco) is NOT touched — this only re-scores the recording.
+        mujoco.mj_forward(model, d)
         bp = q[0:3].copy(); bq = _xyzw(q[3:7])
         tilt = float(np.arccos(np.clip(1 - 2 * (bq[0] ** 2 + bq[1] ** 2), -1, 1)))
         fell = fell or (bp[2] < 0.5 * nom_h) or (tilt > 1.0)
@@ -36,7 +52,7 @@ def compute(qpos_traj, qvel_traj, fz_traj, model, mid, nom_h, HZ):
         log["base_angvel"].append(qvel_traj[t][3:6] if qvel_traj is not None else np.zeros(3))
         log["base_linvel"].append(qvel_traj[t][0:3] if qvel_traj is not None else np.zeros(3))
         log["qvel"].append(qv.copy())
-        log["fz_l"].append(float(fz_traj[t][0])); log["fz_r"].append(float(fz_traj[t][1]))
+        log["fz_l"].append(_foot_fz(model, d, lf)); log["fz_r"].append(_foot_fz(model, d, rf))   # recomputed from qpos (see mj_forward above), not the stale recorded fz_traj
         log["foot_l_pos"].append(d.xpos[lf][:2].copy()); log["foot_r_pos"].append(d.xpos[rf][:2].copy())
         log["foot_l_z"].append(float(d.xpos[lf][2])); log["foot_r_z"].append(float(d.xpos[rf][2]))
         log["foot_l_quat"].append(_xyzw(d.xquat[lf])); log["foot_r_quat"].append(_xyzw(d.xquat[rf]))

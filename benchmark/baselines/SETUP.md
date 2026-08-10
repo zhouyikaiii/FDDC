@@ -74,9 +74,13 @@ Humanoid-GPT / MOSAIC / SONIC use `runs`; HoloMotion uses `runm`. Confirm the ou
 > import; export it yourself to override). (ii) Its policy is a flow model that samples an `initial_noise`
 > (`torch.randn`) every run, and its observations carry upstream noise (`noise_scales`, e.g.
 > `base_ang_vel=0.1`); the shipped adapter reseeds Python/NumPy/PyTorch per clip, runs single-threaded, and
-> defaults `OMNI_CLEAN=1` (zeros the obs noise + action delay for the paper's clean condition), so a run is
-> bit-reproducible. This reproduces the paper's **0.0 / 5.6 / 94.4** (verified deterministically here). Set
-> `OMNI_CLEAN=0` for the upstream noisy config, or `OMNI_SEED=<n>` to draw a different fixed sample.
+> defaults `OMNI_CLEAN=1` (zeros the obs noise + action delay for the paper's clean condition). A single
+> `OMNI_SEED` is bit-reproducible, but OmniXtreme is a flow model whose `initial_noise` sample decides a
+> handful of borderline clips: **Perfect is a deterministic 0 / 90** (it never holds single-leg), while the
+> Marginal / Failure split shifts a few clips across seeds/runs (with the consistent-metrics scoring,
+> observed **0.0 / 2.2–10.0 / 90.0–97.8** over `OMNI_SEED=0,1,2`; earlier runs gave 5.6/94.4, 4.4/95.6,
+> 3.3/96.7). The paper reports **0.0 / 3.3 / 96.7** as one fixed-seed sample; no single seed reproduces it
+> exactly. Set `OMNI_SEED=<n>` for a different fixed draw, or `OMNI_CLEAN=0` for the upstream noisy config.
 
 > **Humanoid-GPT** (targets the Humanoid-GPT version used in the paper). The adapter now **self-handles**
 > the two upstream quirks below, so no manual `cd` or source edit is needed — you only set
@@ -181,13 +185,16 @@ PY
 | Baseline | Perfect | Marginal | Failure |
 |----------|:-------:|:--------:|:-------:|
 | ProtoMotions | 0.0 | 51.1 | 48.9 |
-| OmniXtreme   | 0.0 | 3.3  | 96.7 |
+| OmniXtreme   | 0.0 | 3.3† | 96.7 |
 | GMT          | 0.0 | 18.9 | 81.1 |
 | MOSAIC       | 0.0 | 66.7 | 33.3 |
 | TWIST        | 0.0 | 47.8 | 52.2 |
 | Humanoid-GPT | 0.0 | 75.6 | 24.4 |
 | HoloMotion   | 0.0 | 75.6 | 24.4 |
 | SONIC        | 0.0 | 81.1 | 18.9 |
+
+> † OmniXtreme's Marginal/Failure split is one fixed-seed sample: Perfect is a robust 0/90, but the split
+> shifts a few borderline clips across seeds/runs (flow-model `initial_noise` — see the OmniXtreme note in §2).
 
 The weights-only adapters (ProtoMotions, MOSAIC, SONIC) were spot-checked to reproduce **0/90 Perfect**
 directly from this released package (ProtoMotions full-90: Perfect 0.0 / Failure 48.9, matching the
