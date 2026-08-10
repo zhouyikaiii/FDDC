@@ -68,7 +68,8 @@ Humanoid-GPT / MOSAIC / SONIC use `runs`; HoloMotion uses `runm`. Confirm the ou
 > is 1762-dim), whose SHA256 matches the file used in the paper; the `low_latency/` subfolder is a
 > different 1247-dim model that this adapter does **not** match. Point `SONIC_DIR` at the root files.
 
-> **OmniXtreme:** it runs **CPU-only** and **deterministically**. (i) Its deploy auto-selects CUDA and
+> **OmniXtreme:** it runs **CPU-only**; its outcome tier is a **stochastic sample** (Perfect is a stable 0/90,
+> the Marginal/Failure split drifts — see the seed note at the end of this box). (i) Its deploy auto-selects CUDA and
 > would place some tensors on the GPU while the shared kernel stays on CPU — a mismatch that errors on all
 > 90 clips — so the adapter sets `CUDA_VISIBLE_DEVICES=""` itself on startup (before any torch/deploy
 > import; export it yourself to override). (ii) Its policy is a flow model that samples an `initial_noise`
