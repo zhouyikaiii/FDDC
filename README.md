@@ -1,8 +1,8 @@
 <a href="https://www.pku.edu.cn/"><img src="assets/pku_logo.png" alt="Peking University" width="90" align="right"/></a>
 
-# DDC — Deployable Dynamic-CoM
+# A Change of Frame Makes Balance Observable: Distillation-Free Humanoid Single-Leg Stance
 
-**A unified policy and a method-agnostic sim2sim benchmark for humanoid single-leg balance.**
+**DDC (Deployable Dynamic-CoM)** — a unified policy and a method-agnostic sim2sim benchmark for humanoid single-leg balance.
 
 **Yikai Zhou, Xingyun Wang, Jieming Cui, Bozhou Chen, Yikai Fan, Yixin Zhu\*, Wenxin Li\***<br>
 [Peking University](https://www.pku.edu.cn/) &nbsp;·&nbsp; <sup>\*</sup>Corresponding authors (`yixin.zhu@pku.edu.cn`, `lwx@pku.edu.cn`)
