@@ -5,7 +5,7 @@ Usage:
 import os, sys, json, glob, re, time, numpy as np, onnxruntime as ort, onnx
 from onnx import numpy_helper
 os.environ.setdefault("WBT_ORT_THREADS", "1")
-_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))  # FDDC release repo root
+_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))  # DDC release repo root
 HS = _ROOT
 os.environ["WBT_EVAL_ROBOT_XML"] = os.path.join(HS, "robot", "g1_29dof", "g1_29dof.xml")
 _SANITY = len(sys.argv) > 1 and sys.argv[1] == "sanity"
@@ -31,7 +31,7 @@ PROTO = os.environ["PROTO_ONNX"]
 sess = ort.InferenceSession(PROTO, providers=["CPUExecutionProvider"])
 outn = [o.name for o in sess.get_outputs()]
 # default pose + dof_names (dummy policy for computing com_rel)
-md = {p.key: p.value for p in onnx.load(os.environ.get("FDDC_ROBOT_META_ONNX", os.path.join(os.path.dirname(os.path.abspath(__file__)), "robot_meta.onnx")), load_external_data=False).metadata_props}
+md = {p.key: p.value for p in onnx.load(os.environ.get("DDC_ROBOT_META_ONNX", os.path.join(os.path.dirname(os.path.abspath(__file__)), "robot_meta.onnx")), load_external_data=False).metadata_props}
 dof_names = json.loads(md["dof_names"])
 dja = json.loads(md["experiment_config"])["robot"]["init_state"]["default_joint_angles"]
 default_dof = np.array([dja[n] for n in dof_names], dtype=np.float64)
@@ -42,7 +42,7 @@ dummy = DummyPol(); dummy.dof_names = dof_names; dummy.default_dof = default_dof
 
 MK = ["success", "success_sustained", "track_fail", "fell", "swing_touched", "hop_count", "hop_height_max", "flight_events", "time_to_fall", "foot_activity_area",
       "foot_yaw_drift", "com_dev_pos_mean", "com_dev_pos_max", "com_dev_vel_mean", "xcom_margin_ap_min",
-      "xcom_margin_ml_min", "com_margin_ap_min", "com_margin_ml_min", "xcom_margin_viol_dur", "xcom_min_ttb", "xcom_low_ttb_events", "slippage_mm_s", "action_jerk_rms", "dof_vel_jerk_rms", "track_Epos", "track_Evel", "track_Eacc"]
+      "xcom_margin_ml_min", "xcom_margin_ap_mean", "xcom_margin_ml_mean", "com_margin_ap_mean", "com_margin_ml_mean", "com_margin_ap_min", "com_margin_ml_min", "xcom_margin_viol_dur", "xcom_min_ttb", "xcom_low_ttb_events", "slippage_mm_s", "action_jerk_rms", "dof_vel_jerk_rms", "track_Epos", "track_Evel", "track_Eacc"]
 
 def rollout(motion_id, seed, dof_vel_noise=float(os.environ.get("PROTO_NOISE","0.20")), dof_vel_delay=int(os.environ.get("PROTO_DELAY","1"))):
     ref = W.load_motion_npz(motion_id); mref = W.NpzMotionReference(ref["npz"]); T = ref["T"]
@@ -82,7 +82,7 @@ def rollout(motion_id, seed, dof_vel_noise=float(os.environ.get("PROTO_NOISE","0
         hist = action.reshape(1, 1, 29).astype(np.float32); last_act = action.astype(np.float32)
         tilt = float(np.arccos(np.clip(-sim.projected_gravity_base()[2], -1, 1)))
         lp, lv, lz = sim.foot_state(sim.lfoot); rp, rv, rz = sim.foot_state(sim.rfoot)
-        com, comv = sim.com_state(); cur_h = float(sim.data.qpos[2])
+        com = sim.com_true(); comv = (com - log["com"][-1]) * W.CONTROL_HZ if log["com"] else np.zeros(3); cur_h = float(sim.data.qpos[2])  # true xipos CoM + finite-diff (unified); obs com_rel above stays proxy
         fell = fell or (cur_h < 0.5 * nominal_h) or (tilt > 1.0)
         log["t"].append(t / W.CONTROL_HZ); log["base_pos"].append(sim.data.qpos[0:3].copy())
         log["base_quat"].append(sim.base_quat_xyzw()); log["base_angvel"].append(sim.base_ang_vel_base())

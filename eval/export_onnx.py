@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Export the FDDC actor from the .pt to ONNX (obs -> actions).
+"""Export the DDC actor from the .pt to ONNX (obs -> actions).
 
 Uses the actor definition from the deploy export toolchain (InnerActor / CompleteActor / load_actor):
 [Linear -> LayerNorm -> SiLU] x3 -> Linear -> tanh-squash, on the (obs - mean)/(std + 0.01) normalized
@@ -49,7 +49,7 @@ class CompleteActor(nn.Module):
 
 
 def load_actor(pt):
-    d = torch.load(pt, map_location="cpu", weights_only=False)
+    d = torch.load(pt, map_location="cpu", weights_only=True)
     ca = CompleteActor()
     res = ca.actor.load_state_dict(d["actor_state_dict"], strict=False)
     assert not res.missing_keys, f"actor params not loaded: {res.missing_keys}"

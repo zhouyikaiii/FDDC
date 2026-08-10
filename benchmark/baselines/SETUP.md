@@ -3,7 +3,7 @@
 Each adapter here is the **exact script used to score that baseline in the paper**. An adapter runs the
 baseline's *own* policy — and, for **GMT / TWIST / OmniXtreme / Humanoid-GPT**, the baseline's *own*
 observation and MuJoCo sim (its native deployment harness); for **ProtoMotions / MOSAIC / SONIC /
-HoloMotion**, the shared FDDC G1 plant (`../../eval/wbt_rollout.py`). Every method is scored on the
+HoloMotion**, the shared DDC G1 plant (`../../eval/wbt_rollout.py`). Every method is scored on the
 **same motion set** by the **same outcome metric** (`../../eval/metrics.py`), judged from the robot's
 true physical state — but the physics plant is not byte-identical across all eight (see the plant note
 in [`../README.md`](../README.md)).
@@ -180,21 +180,21 @@ PY
 
 | Baseline | Perfect | Marginal | Failure |
 |----------|:-------:|:--------:|:-------:|
-| ProtoMotions | 0.0 | 53.3 | 46.7 |
-| OmniXtreme   | 0.0 | 5.6  | 94.4 |
+| ProtoMotions | 0.0 | 51.1 | 48.9 |
+| OmniXtreme   | 0.0 | 3.3  | 96.7 |
 | GMT          | 0.0 | 18.9 | 81.1 |
-| MOSAIC       | 0.0 | 64.4 | 35.6 |
-| TWIST        | 0.0 | 50.0 | 50.0 |
+| MOSAIC       | 0.0 | 66.7 | 33.3 |
+| TWIST        | 0.0 | 47.8 | 52.2 |
 | Humanoid-GPT | 0.0 | 75.6 | 24.4 |
 | HoloMotion   | 0.0 | 75.6 | 24.4 |
 | SONIC        | 0.0 | 81.1 | 18.9 |
 
 The weights-only adapters (ProtoMotions, MOSAIC, SONIC) were spot-checked to reproduce **0/90 Perfect**
-directly from this released package (ProtoMotions full-90: Perfect 0.0 / Failure 46.7, matching the
+directly from this released package (ProtoMotions full-90: Perfect 0.0 / Failure 48.9, matching the
 table). The repo-based baselines reproduce the same Perfect = 0 once their repo + weights are supplied.
 
 ## 6. Robot metadata
 
 `robot_meta.onnx` is a tiny (~3 KB) metadata-only ONNX carrying the Unitree-G1 constants the adapters
 read for the shared PD (`dof_names`, `kp`, `kd`, `action_scale`, default pose). Override with
-`FDDC_ROBOT_META_ONNX`. These constants equal `../../policy/robot_config.json`.
+`DDC_ROBOT_META_ONNX`. These constants equal `../../policy/robot_config.json`.

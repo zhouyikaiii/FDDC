@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Modified from the Holosoma framework (Amazon FAR, Apache-2.0): https://github.com/amazon-far/holosoma
-# FDDC training launcher — multi-GPU FastSAC WBT single-leg-balance training.
+# DDC training launcher — multi-GPU FastSAC WBT single-leg-balance training.
 # DATA defaults to the released stratified motion set (data_stratified_900/train); override via env.
 # Default matches the released policy: NUM_ENVS=8192 total (paper Table 6) and buffer_size=384.
 # The total is split across your visible GPUs (NUM_ENVS/NPROC each) — e.g. 1024/GPU on 8x RTX 3080 or
@@ -18,7 +18,7 @@ NPROC=$(echo "$CUDA_VISIBLE_DEVICES" | awk -F, '{print NF}')   # num processes =
 
 NUM_ENVS=${NUM_ENVS:-8192}             # global total (paper Table 6); split across NPROC GPUs = NUM_ENVS/NPROC each
 BUFFER=${BUFFER:-384}                   # replay-buffer capacity used by the released policy; override via env
-DATA=${DATA:-/path/to/data_stratified_900/train}   # motion dir = the released FDDC training set; override via env
+DATA=${DATA:-/path/to/data_stratified_900/train}   # motion dir = the released DDC training set; override via env
 
 cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"   # cd to the script's repo root; survives rename/move
 MC=--command.setup_terms.motion_command.params.motion_config

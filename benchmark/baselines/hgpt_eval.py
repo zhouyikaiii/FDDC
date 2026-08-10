@@ -5,7 +5,7 @@ Usage:
 """
 import os, sys, json, glob, re, time
 os.environ.setdefault("MUJOCO_GL", "egl")
-_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))  # FDDC release repo root
+_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))  # DDC release repo root
 _HGPT_REPO = os.environ["HUMANOID_GPT_REPO"]
 sys.path.insert(0, _HGPT_REPO)
 if len(sys.argv) > 2 and sys.argv[1] in ("run", "runs", "fullruns"):

@@ -4,7 +4,7 @@ Layout: [command x5, anchor x5, angvel x5, jpos x5, jvel x5, act x5] (blocked pe
 Usage: python mosaic_eval.py sanity [histflip] | run <motion_dir> <tag> <shard> <nsh> <outdir> [histflip]"""
 import os, sys, json, glob, re, time, numpy as np, onnxruntime as ort, onnx
 os.environ.setdefault("WBT_ORT_THREADS", "1")
-_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))  # FDDC release repo root
+_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))  # DDC release repo root
 HS = _ROOT
 os.environ["WBT_EVAL_ROBOT_XML"] = os.path.join(HS, "robot", "g1_29dof", "g1_29dof.xml")
 sys.path.insert(0, os.path.join(HS, "eval"))
@@ -24,7 +24,7 @@ except Exception: pass
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import fulllog as FL
 
 MOSAIC = os.environ["MOSAIC_ONNX"]
-META = os.environ.get("FDDC_ROBOT_META_ONNX", os.path.join(os.path.dirname(os.path.abspath(__file__)), "robot_meta.onnx"))
+META = os.environ.get("DDC_ROBOT_META_ONNX", os.path.join(os.path.dirname(os.path.abspath(__file__)), "robot_meta.onnx"))
 md = {p.key: p.value for p in onnx.load(META, load_external_data=False).metadata_props}
 dof_names = json.loads(md["dof_names"])
 action_scale = np.asarray(json.loads(md["action_scale"]), dtype=np.float64).reshape(-1)

@@ -314,10 +314,14 @@ def xcom_ttb_margin(com: np.ndarray, com_vel: np.ndarray, support_foot_xy: np.nd
         cttbs.append(min(_ttb_axis(rel[0], vel[0], *FOOT_AP), _ttb_axis(rel[1], vel[1], *FOOT_ML)))
     xttbs = np.array(xttbs); cttbs = np.array(cttbs)
     return {
-        "xcom_margin_ap_min": float(np.min(margins_ap)) if margins_ap else 0.0,
-        "xcom_margin_ml_min": float(np.min(margins_ml)) if margins_ml else 0.0,
+        "xcom_margin_ap_min": float(np.min(margins_ap)) if margins_ap else 0.0,   # MoS AP min (Hof margin of stability)
+        "xcom_margin_ml_min": float(np.min(margins_ml)) if margins_ml else 0.0,   # MoS ML min (binding axis for 1-leg)
+        "xcom_margin_ap_mean": float(np.mean(margins_ap)) if margins_ap else 0.0,  # MoS AP mean
+        "xcom_margin_ml_mean": float(np.mean(margins_ml)) if margins_ml else 0.0,  # MoS ML mean
         "com_margin_ap_min": float(np.min(cmargins_ap)) if cmargins_ap else 0.0,
         "com_margin_ml_min": float(np.min(cmargins_ml)) if cmargins_ml else 0.0,
+        "com_margin_ap_mean": float(np.mean(cmargins_ap)) if cmargins_ap else 0.0,
+        "com_margin_ml_mean": float(np.mean(cmargins_ml)) if cmargins_ml else 0.0,
         "xcom_min_ttb": float(np.min(xttbs)) if len(xttbs) else 0.0,          # xCoM side (primary)
         "xcom_low_ttb_events": int(np.sum(xttbs < t_warn)),                   # xCoM-side low-TTB frames
         "com_min_ttb": float(np.min(cttbs)) if len(cttbs) else 0.0,           # CoM side (honest comparison)

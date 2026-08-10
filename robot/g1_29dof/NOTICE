@@ -21,11 +21,11 @@ this project; this redistribution retains the copyright notice, the list of cond
 disclaimer (see `LICENSE`).
 
 Note on foot-ground contact: this XML's `<contact>` block (14 foot-floor pairs, `solref="0.01 1"`,
-`friction="0.8 0.8"`) matches the upstream Holosoma value and is FDDC-unmodified. The benchmark does not
+`friction="0.8 0.8"`) matches the upstream Holosoma value and is DDC-unmodified. The benchmark does not
 use it — the evaluation harness (`eval/wbt_rollout.py`) drops that block and re-injects the deploy-matched
 floor-contact parameters (effective solref ~0.0105, friction 1.0) at runtime, as documented there.
 
-Why this exact file is bundled: it is the precise MuJoCo plant the FDDC policy was validated against
+Why this exact file is bundled: it is the precise MuJoCo plant the DDC policy was validated against
 (7-capsule collision feet, armature, per-joint effort limits). A different G1 MJCF can change the
 foot-ground contact and link inertias — and therefore the benchmark numbers — so we ship this exact
 model rather than a generic one.

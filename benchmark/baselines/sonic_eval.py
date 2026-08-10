@@ -4,7 +4,7 @@ decoder = token_state(64) + his[ang_vel, jpos-def, jvel, lastact, grav] each 10 
 Usage: sanity | run <motion_dir> <tag> <shard> <nsh> <outdir>"""
 import os, sys, json, glob, re, numpy as np, onnxruntime as ort, onnx
 os.environ.setdefault("WBT_ORT_THREADS", "1")
-_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))  # FDDC release repo root
+_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))  # DDC release repo root
 HS = _ROOT
 os.environ["WBT_EVAL_ROBOT_XML"] = os.path.join(HS, "robot", "g1_29dof", "g1_29dof.xml")
 if len(sys.argv) > 2 and sys.argv[1] in ("run", "runs", "fullruns"):
@@ -26,7 +26,7 @@ IL2MJ = np.array([0,6,12,1,7,13,2,8,14,3,9,15,22,4,10,16,23,5,11,17,24,18,25,19,
 MJ2IL = np.array([0,3,6,9,13,17,1,4,7,10,14,18,2,5,8,11,15,19,21,23,25,27,12,16,20,22,24,26,28])  # for action->mujoco
 I2M = IL2MJ; M2I = MJ2IL
 DEFAULT = np.array([-0.312,0,0,0.669,-0.363,0, -0.312,0,0,0.669,-0.363,0, 0,0,0, 0.2,0.2,0,0.6,0,0,0, 0.2,-0.2,0,0.6,0,0,0], np.float64)  # mujoco order
-META = os.environ.get("FDDC_ROBOT_META_ONNX", os.path.join(os.path.dirname(os.path.abspath(__file__)), "robot_meta.onnx"))
+META = os.environ.get("DDC_ROBOT_META_ONNX", os.path.join(os.path.dirname(os.path.abspath(__file__)), "robot_meta.onnx"))
 _md = {p.key: p.value for p in onnx.load(META, load_external_data=False).metadata_props}
 ASCALE = np.asarray(json.loads(_md["action_scale"]), np.float64).reshape(-1)  # mujoco order (same as G1)
 KP = np.asarray(json.loads(_md["kp"]), np.float64); KD = np.asarray(json.loads(_md["kd"]), np.float64)

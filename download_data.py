@@ -1,18 +1,18 @@
 #!/usr/bin/env python
-"""Fetch the FDDC stratified single-leg-balance motions (900 clips) from HuggingFace into data/.
+"""Fetch the DDC stratified single-leg-balance motions (900 clips) from HuggingFace into data/.
 
 The motion .npz are hosted on the HuggingFace Hub (not in git). Run this once before the benchmark:
 
     pip install huggingface_hub
     python download_data.py
 
-Override the source repo with the FDDC_HF_REPO env var if you mirror the dataset elsewhere.
+Override the source repo with the DDC_HF_REPO env var if you mirror the dataset elsewhere.
 """
 import os
 
-HF_REPO = os.environ.get("FDDC_HF_REPO", "zhouyikai/FDDC-single-leg-balance")
+HF_REPO = os.environ.get("DDC_HF_REPO", "zhouyikai/FDDC-single-leg-balance")
 # Pin a fixed dataset revision so the download is reproducible even if the HF main branch later changes.
-HF_REVISION = os.environ.get("FDDC_HF_REVISION", "17668899428b3e31fbbc6cf32253cfcfeec71922")
+HF_REVISION = os.environ.get("DDC_HF_REVISION", "17668899428b3e31fbbc6cf32253cfcfeec71922")
 DEST = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "data_stratified_900")
 
 

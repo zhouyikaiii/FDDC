@@ -1,6 +1,6 @@
 <a href="https://www.pku.edu.cn/"><img src="assets/pku_logo.png" alt="Peking University" width="90" align="right"/></a>
 
-# FDDC — First Deployable Dynamic-CoM
+# DDC — Deployable Dynamic-CoM
 
 **A unified policy and a method-agnostic sim2sim benchmark for humanoid single-leg balance.**
 
@@ -9,14 +9,14 @@
 
 📄 Paper: [arXiv:2608.00500](https://arxiv.org/abs/2608.00500) &nbsp;·&nbsp; 📺 Video: [YouTube](https://www.youtube.com/watch?v=ue3DhT5B3mU)
 
-![FDDC holds clean single-leg balance across 90 stratified poses and transfers to a real Unitree G1](assets/fig_teaser.png)
+![DDC holds clean single-leg balance across 90 stratified poses and transfers to a real Unitree G1](assets/fig_teaser.png)
 
-[![FDDC on a real Unitree G1 — single-leg balance across distinct poses (click to watch)](assets/video_thumb.jpg)](https://www.youtube.com/watch?v=ue3DhT5B3mU)
+[![DDC on a real Unitree G1 — single-leg balance across distinct poses (click to watch)](assets/video_thumb.jpg)](https://www.youtube.com/watch?v=ue3DhT5B3mU)
 
 ▶️ Watch the full video on [YouTube](https://www.youtube.com/watch?v=ue3DhT5B3mU).
 
 Unified humanoid policies track dances, runs, and backflips, yet stumble on a simple demand: staying
-balanced on one leg. FDDC is the first single-leg-balance policy to deploy **directly on a real Unitree
+balanced on one leg. DDC is the first single-leg-balance policy to deploy **directly on a real Unitree
 G1 without teacher–student distillation**. Its key idea is a *deployable* dynamic-CoM observation: the
 capture point (xCoM) — the center of mass extrapolated by its velocity — expressed **relative to the
 support foot**, so the base linear velocity (which no on-board humanoid sensor can measure) cancels
@@ -25,13 +25,13 @@ reward library translated term-by-term from human postural-control science (marg
 time-to-boundary, ankle→knee→hip hierarchy, jerk), and trained by asymmetric FastSAC with a privileged
 critic.
 
-![FDDC method overview: an asymmetric actor–critic where the deployable actor sees a support-relative dynamic-CoM state and a human-science reward library shapes balance](assets/fig1_overview.png)
+![DDC method overview: an asymmetric actor–critic where the deployable actor sees a support-relative dynamic-CoM state and a human-science reward library shapes balance](assets/fig1_overview.png)
 
 The same trained actor runs **directly on a real Unitree G1** (no distillation):
 
-![FDDC deployed on a real Unitree G1, holding single-leg balance across distinct poses](assets/fig_realrobot_montage.png)
+![DDC deployed on a real Unitree G1, holding single-leg balance across distinct poses](assets/fig_realrobot_montage.png)
 
-This repository lets anyone **reproduce the benchmark for the deployed FDDC checkpoint** (`model_0262000.pt`)
+This repository lets anyone **reproduce the benchmark for the deployed DDC checkpoint** (`model_0262000.pt`)
 and score it under the exact conditions from the paper — from the `.pt` alone, no ONNX, no IsaacSim,
 no training/deploy runtime.
 
@@ -41,14 +41,14 @@ no training/deploy runtime.
 
 | | |
 |---|---|
-| **Policy** | `policy/model_0262000.pt` — the deployed FDDC checkpoint (the benchmark-selected one); the inference actor + observation normalizer, which is all `run_eval.py` needs and reproduces every number here. |
+| **Policy** | `policy/model_0262000.pt` — the deployed DDC checkpoint (the benchmark-selected one); the inference actor + observation normalizer, which is all `run_eval.py` needs and reproduces every number here. |
 | **Benchmark** | `eval/` — a self-contained MuJoCo sim2sim harness (`numpy` + `mujoco` + `torch`). |
 | **Motions** | `data/data_stratified_900/` — the 900-clip stratified single-leg set (720 train / 90 val / 90 test). |
 | **Robot** | `robot/g1_29dof/` — the exact Unitree G1 29-DoF MuJoCo plant the policy was validated on. |
-| **Training** | `training/` — the FDDC-specific implementation (deployable dynamic-CoM obs + reward library) and how to retrain; see `training/TRAINING.md`. |
+| **Training** | `training/` — the DDC-specific implementation (deployable dynamic-CoM obs + reward library) and how to retrain; see `training/TRAINING.md`. |
 | **Deployment** | `DEPLOYMENT.md` — the real on-robot recipe: the Holosoma `run_sim` / `run_policy` two-process stack, the sim2sim + sim2real commands, and the safety caveats. |
 
-Together these are the paper's released **"full stack — data, code, policy, and benchmark"**:
+Together these are the paper's released **"full stack — training code, benchmark, data, checkpoint, and deployment recipe"**:
 data = `data/`, code = `training/` (method) + `eval/` (harness), policy = `policy/`, benchmark = `eval/`.
 
 The policy is run **directly from the `.pt`** (`eval/fast_policy.py` reproduces the actor in numpy,
@@ -81,14 +81,14 @@ python download_data.py
 # 1. environment (CPU is fine; a CPU-only torch build works)
 pip install -r requirements.txt
 
-# 2. clean benchmark — reproduces the headline (expect Perfect 95.6 / Marginal 3.3 / Failure 1.1)
+# 2. clean benchmark — reproduces the headline (expect Perfect 98.9 / Marginal 0.0 / Failure 1.1)
 cd eval
 python run_eval.py --condition clean            # all 90 held-out test motions, K=1   (~75 s)
 
 # quick smoke on the first 8 motions
 python run_eval.py --condition clean --limit 8
 
-# 3. noisy benchmark — deployment-relevant obs noise, K=10 (expect Perfect 62.2)
+# 3. noisy benchmark — deployment-relevant obs noise, K=10 (expect Perfect 61.8)
 python run_eval.py --condition noisy            # ~12 min
 
 # score a different split (e.g. validation) or your own motions:
@@ -104,14 +104,14 @@ The deployed checkpoint reproduces the paper's Table 1 (clean) / Table 2 (noisy)
 
 | condition | Perfect | Marginal | Failure |
 |-----------|:-------:|:--------:|:-------:|
-| clean (K=1)  | **95.6 %** (86/90) | 3.3 %  | 1.1 % (1 fall) |
-| noisy (K=10) | **62.2 %**         | 36.7 % | 1.1 % |
+| clean (K=1)  | **98.9 %** (89/90) | 0.0 %  | 1.1 % (1 fall) |
+| noisy (K=10) | **61.8 %**         | 37.1 % | 1.1 % |
 
 *(Both rows reproduced bit-exact from `model_0262000.pt` with this harness.)*
 
 Per-class clean Perfect-rate over the 3×3 pose grid (pelvis height × swing-foot height): every class
-is 100 % except the two that pair a **high swing foot** with a low/mid pelvis (`P0S2` and `P1S2`, each
-80 %) — difficulty emerges empirically at the deep-squat / high-lift corners, as in the paper.
+is 100 % except `P1S2` (mid pelvis × **high swing foot**, 90 %) — the single hardest corner, and the
+one class holding the lone clean fall, as in the paper.
 
 ## Package layout
 
@@ -120,14 +120,14 @@ opensource_release/
 ├─ README.md            LICENSE (Apache-2.0)   CITATION.cff   requirements.txt
 ├─ eval/
 │  ├─ run_eval.py       benchmark entry point (Perfect/Marginal/Failure, per-class)
-│  ├─ fast_policy.py    FDDC actor from the .pt in numpy (bit-exact vs the IsaacSim ONNX)
+│  ├─ fast_policy.py    DDC actor from the .pt in numpy (bit-exact vs the IsaacSim ONNX)
 │  ├─ wbt_rollout.py    self-contained MuJoCo rollout (deploy-faithful obs, PD, noise switches)
 │  └─ metrics.py        postural-control metric suite (tiers + MoS / TTB / slippage / jerk / tracking)
 ├─ policy/
-│  ├─ model_0262000.pt  deployed FDDC checkpoint
+│  ├─ model_0262000.pt  deployed DDC checkpoint
 │  └─ robot_config.json G1 constants (dof_names, kp, kd, action_scale, default pose, joint limits)
 ├─ robot/g1_29dof/      g1_29dof.xml + meshes/ + NOTICE   (Unitree-derived plant)
-├─ training/            FDDC method on Holosoma: fddc_src/ (obs + reward + config) + train_full.sh + TRAINING.md + NOTICE
+├─ training/            DDC method on Holosoma: fddc_src/ (obs + reward + config) + train_full.sh + TRAINING.md + NOTICE
 └─ data/
    ├─ data_stratified_900/{train,val,test}/  sample_*_mj.npz  (+ dataset_info.json, manifest.csv)
    ├─ LICENSE           GPL-3.0 (motions; derived from AMS)
@@ -161,8 +161,8 @@ Built on the public **Holosoma** framework (Amazon FAR, 2025).
 Paper: **[arXiv:2608.00500](https://arxiv.org/abs/2608.00500)**
 
 ```bibtex
-@article{zhou2026fddc,
-  title   = {First Deployable Dynamic-CoM: A Unified Policy and Method-Agnostic Benchmark for Humanoid Single-Leg Balance},
+@article{zhou2026ddc,
+  title   = {A Change of Frame Makes Balance Observable: Distillation-Free Humanoid Single-Leg Stance},
   author  = {Zhou, Yikai and Wang, Xingyun and Cui, Jieming and Chen, Bozhou and Fan, Yikai and Zhu, Yixin and Li, Wenxin},
   journal = {arXiv preprint arXiv:2608.00500},
   year    = {2026}

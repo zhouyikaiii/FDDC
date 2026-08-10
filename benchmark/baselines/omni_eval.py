@@ -7,7 +7,7 @@ import numpy as np
 os.environ.setdefault("MUJOCO_GL", "egl")
 os.environ.setdefault("CUDA_VISIBLE_DEVICES", "")   # run CPU-only: its deploy auto-selects CUDA and would mix GPU tensors with the shared CPU kernel (errors on all 90); export CUDA_VISIBLE_DEVICES yourself to override. Must precede any torch/deploy import.
 os.environ.setdefault("OMNI_CLEAN", "1")            # clean condition by default: zero the upstream obs noise (noise_scales) + action delay (paper "clean, no observation noise"). Set OMNI_CLEAN=0 to run the upstream noisy config.
-_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))  # FDDC release repo root
+_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))  # DDC release repo root
 REPO = os.environ["OMNI_REPO"]; sys.path.insert(0, REPO); os.chdir(REPO)
 import mujoco, torch, random
 torch.set_num_threads(1)   # single-thread -> deterministic + don't saturate cores

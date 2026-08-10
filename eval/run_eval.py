@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-"""FDDC single-leg-balance benchmark — evaluate one policy (.pt) on the held-out motions.
+"""DDC single-leg-balance benchmark — evaluate one policy (.pt) on the held-out motions.
 
 Reproduces the paper's headline outcome tiers (Perfect / Marginal / Failure) for the deployed
-FDDC checkpoint. One .pt is scored against every motion npz via the decoupled reference path
+DDC checkpoint. One .pt is scored against every motion npz via the decoupled reference path
 (use_npz_ref=True) — no per-motion ONNX needed.
 
   Perfect  = clean single-leg stance: support foot never hops, swing foot never touches down,
@@ -11,9 +11,9 @@ FDDC checkpoint. One .pt is scored against every motion npz via the decoupled re
   Marginal = stays upright but breaks the single-leg constraint (hops / touches the swing foot down).
 
 Conditions (paper §5.1):
-  clean  — deterministic, no observation noise (K=1)             -> Table 1 (FDDC 95.6 / 3.3 / 1.1)
+  clean  — deterministic, no observation noise (K=1)             -> Table 1 (DDC 98.9 / 0.0 / 1.1)
   noisy  — deployment-relevant obs noise: per-step dof-vel noise + 1-step delay + HuB IMU-OU
-           orientation drift, averaged over K=10 fixed seeds     -> Table 2 (FDDC 62.2)
+           orientation drift, averaged over K=10 fixed seeds     -> Table 2 (DDC 61.8)
 """
 import argparse, json, os, sys, time
 from collections import defaultdict

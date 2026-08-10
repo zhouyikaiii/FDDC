@@ -1,4 +1,4 @@
-FDDC training reference — training/
+DDC training reference — training/
 ===================================
 
 The files under training/fddc_src/ (and train_full.sh) are MODIFIED from the Holosoma framework:
@@ -7,7 +7,7 @@ The files under training/fddc_src/ (and train_full.sh) are MODIFIED from the Hol
     Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
     Licensed under the Apache License, Version 2.0 (full text in the repository LICENSE file).
 
-As required by Apache-2.0 §4(b), we state the changes. Modifications for FDDC (this work):
+As required by Apache-2.0 §4(b), we state the changes. Modifications for DDC (this work):
 
   - managers/observation/terms/wbt.py
         added the deployable support-relative dynamic-CoM actor observation
@@ -24,8 +24,8 @@ As required by Apache-2.0 §4(b), we state the changes. Modifications for FDDC (
         (paper Table 6), and the FastSAC training hyperparameters (paper Table 6).
 
   - train_full.sh
-        the multi-GPU FastSAC launch command for the FDDC experiment.
+        the multi-GPU FastSAC launch command for the DDC experiment.
 
-These files are a small, readable SUBSET of Holosoma, provided so the FDDC method is transparent and
+These files are a small, readable SUBSET of Holosoma, provided so the DDC method is transparent and
 reproducible in principle. They are NOT a redistribution of the full framework — install upstream
 Holosoma (Apache-2.0) to run them; see TRAINING.md.

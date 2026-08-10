@@ -235,7 +235,7 @@ class G1Sim:
         self.dt = m.opt.timestep
         self.substeps = SUBSTEPS
         # PHYSICS-step dof_vel history (filled by pd_step). The deploy bridge publishes the LowState every
-        # PHYSICS step, so its DOF_VEL_DELAY_STEPS counts physics steps (1 step = 1/fps s = 5 ms @ 200 Hz),
+        # PHYSICS step, so its DOF_VEL_DELAY_STEPS counts physics steps (1 step = 1/fps s = 0.5 ms @ 2000 Hz),
         # NOT control steps (20 ms). The dof_vel-obs delay must be applied at this substep rate to match.
         self._vel_hist_sub: list = []
         self._v6 = np.zeros(6)  # scratch for mj_objectVelocity
@@ -274,6 +274,11 @@ class G1Sim:
             self._vel_hist_sub.append(self.dof_vel())
         if len(self._vel_hist_sub) > self.substeps + 2:
             self._vel_hist_sub = self._vel_hist_sub[-(self.substeps + 2):]
+        # mj_step computes derived quantities (xpos/xipos/xquat/contacts) at the pre-integration qpos and
+        # THEN integrates, so on return those lag qpos/qvel by one substep. Re-sync them so the next
+        # build_obs + log read ONE consistent physical state (mirrors the settle_freeze mj_forward). This
+        # only recomputes derived qtys — it does not integrate, so the physics trajectory is unchanged.
+        mujoco.mj_forward(self.model, self.data)
 
     def settle_freeze(self, n_steps=50):
         """Deploy-style freeze-frame0. The robot is held RIGID at the exact frame-0 configuration (base
@@ -290,6 +295,10 @@ class G1Sim:
                 self.data.qpos[3:] = full0[3:]      # base orientation + all 29 joints = frame0
                 self.data.qvel[0:2] = 0.0
                 self.data.qvel[3:] = 0.0            # only base-z (qpos[2]/qvel[2]) is free
+        # refresh xpos/xipos/derived from the final frozen qpos: the loop overwrites qpos AFTER the last
+        # mj_step, so without this the first logged frame's CoM/keypoints lag one config (<1 mm). One
+        # mj_forward removes that lag; it does not integrate, so the physics/handoff are unchanged.
+        mujoco.mj_forward(self.model, self.data)
 
     # --- state getters ---
     def base_quat_xyzw(self):
@@ -336,6 +345,15 @@ class G1Sim:
             mujoco.mj_objectVelocity(m, d, mujoco.mjtObj.mjOBJ_BODY, i, self._v6, 0)  # world-frame
             comv += mi * self._v6[3:6]
         return com / self.total_mass, comv / self.total_mass
+
+    def com_true(self):
+        """TRUE whole-body CoM (world): mass-weighted per-body CoM (d.xipos) = Sum_i m_i*xipos_i / Sum_i m_i.
+        This is the METRIC-side CoM, byte-identical to fulllog_native.py and every baseline, so all 9
+        methods are scored against the SAME CoM. Distinct from com_state() (link-ORIGIN proxy, ~cm off with
+        a systematic fore/aft bias) which the POLICY OBS (build_obs whole_body_com_rel_support_center) keeps
+        using UNCHANGED. com_vel is finite-differenced by the caller at CONTROL_HZ (matches the baselines)."""
+        m, d = self.model, self.data
+        return (d.xipos * m.body_mass[:, None]).sum(0) / m.body_mass.sum()
 
     def com_rel_jac_world(self, support_mask: np.ndarray) -> np.ndarray:
         """World-frame Jacobian of (link-origin mass-weighted CoM − mask-weighted support-foot center)
@@ -624,7 +642,7 @@ def run_rollout(onnx_path: str, motion_id: str, max_frames: int | None = None, s
         # dof_vel observation: `dof_vel_delay` PHYSICS-step delay THEN fresh uniform noise (deploy bridge
         # order + rate). `_vel_hist_sub` is filled by pd_step at the physics-step rate; its newest entry is
         # the current velocity, so a delay of `dof_vel_delay` physics steps reads `[-1 - dof_vel_delay]`
-        # (deploy DOF_VEL_DELAY_STEPS=1 = 5 ms @ 200 Hz, NOT the 20 ms control step -- the earlier control-step
+        # (deploy DOF_VEL_DELAY_STEPS=1 = 0.5 ms @ 2000 Hz, NOT the 20 ms control step -- the earlier control-step
         # delay over-lagged com_rel 4x and made the policy fall where the real deploy only hops occasionally).
         clean_dv = sim.dof_vel()
         sub = sim._vel_hist_sub
@@ -664,7 +682,11 @@ def run_rollout(onnx_path: str, motion_id: str, max_frames: int | None = None, s
         # log TRUE world state (pre-step: the state the policy acted on); qvel is the CLEAN velocity
         tilt = float(np.arccos(np.clip(-sim.projected_gravity_base()[2], -1, 1)))
         lp, lv, lz = sim.foot_state(sim.lfoot); rp, rv, rz = sim.foot_state(sim.rfoot)
-        com, comv = sim.com_state()
+        # metric-side CoM = TRUE whole-body CoM (mass-weighted per-body xipos), unified across all 9 methods
+        # (matches fulllog_native / the baselines); com_vel = finite-diff at CONTROL_HZ. The POLICY OBS
+        # com_rel (build_obs, above) keeps the link-origin proxy com_state() -- this only changes the metrics.
+        com = sim.com_true()
+        comv = (com - log["com"][-1]) * CONTROL_HZ if log["com"] else np.zeros(3)
         cur_h = float(sim.data.qpos[2])
         fell = fell or (cur_h < fall_h_frac * nominal_h) or (tilt > fall_tilt)
         log["t"].append(t / CONTROL_HZ)

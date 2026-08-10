@@ -1,9 +1,13 @@
-"""Unified success metric (= metrics.py success): success = hop_count==0 AND not fell AND not swing_touched.
+"""Sustained single-leg success (== metrics.py `success_sustained`): hop_count==0 AND not fell AND not
+swing_touched. This is the keypoint-free tier check; the HuB 0.5 m 12-keypoint tracking gate that
+metrics.py folds into its FINAL `success` needs the keypoint trajectories and is applied there
+(compute_metrics), NOT here — for the gated, reported number use compute_metrics / an adapter's full-metric
+sub-command. (No method scored 0/90 Perfect is affected: a fall/hop already fails the tier before the gate.)
 Requires per-step fz_l, fz_r (foot contact normal force), base_z, tilt (rad) plus nominal_h, dt, mass, motion_id."""
 import os
 import sys
 import numpy as np
-_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))  # FDDC release repo root
+_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))  # DDC release repo root
 HS = _ROOT
 sys.path.insert(0, os.path.join(HS, "eval"))
 import metrics as M

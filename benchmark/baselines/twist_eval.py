@@ -5,12 +5,12 @@ import os, sys, json, glob, re, time
 import numpy as np, torch, mujoco
 torch.set_num_threads(1)
 os.environ.setdefault("MUJOCO_GL", "egl")
-_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))  # FDDC release repo root
+_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))  # DDC release repo root
 REPO = os.environ["TWIST_REPO"]
 XML = f"{REPO}/assets/g1/g1_sim2sim_with_wrist_roll.xml"
 PT = os.environ["TWIST_WEIGHTS"]
 HS = _ROOT
-META = os.environ.get("FDDC_ROBOT_META_ONNX", os.path.join(os.path.dirname(os.path.abspath(__file__)), "robot_meta.onnx"))
+META = os.environ.get("DDC_ROBOT_META_ONNX", os.path.join(os.path.dirname(os.path.abspath(__file__)), "robot_meta.onnx"))
 os.environ.setdefault("WBT_EVAL_ROBOT_XML", os.path.join(HS, "robot", "g1_29dof", "g1_29dof.xml"))
 if len(sys.argv) > 2 and sys.argv[1] in ("runs", "fullruns"):
     os.environ["WBT_EVAL_MOTION_DIR"] = sys.argv[2]
@@ -144,6 +144,7 @@ def rollout(npz, flog=None):
         for _ in range(20):
             tau = (pdt25 - d.qpos[7:])*KP - d.qvel[6:]*KD
             tau = np.clip(tau, -TLIM, TLIM); d.ctrl[:] = tau; mujoco.mj_step(m, d)
+        mujoco.mj_forward(m, d)  # sync xpos/contacts to the just-integrated qpos (mj_step leaves derived qtys one substep stale — same fix as G1Sim.pd_step)
         fzl = FZ(m, d, lf); fzr = FZ(m, d, rf)
         hs.append(np.concatenate([d.qpos[:7], [float(d.xpos[lf, 2]), float(d.xpos[rf, 2]), fzl, fzr]]))
         if flog is not None:

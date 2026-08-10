@@ -6,7 +6,7 @@ Usage:
 import os, sys, glob, re, json, time, pickle
 import numpy as np
 os.environ.setdefault("MUJOCO_GL", "egl")
-_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))  # FDDC release repo root
+_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))  # DDC release repo root
 REPO = os.environ["GMT_REPO"]; sys.path.insert(0, REPO); os.chdir(REPO)
 
 # ---- stub out the on-screen viewer to make it headless ----
@@ -96,6 +96,7 @@ def run_motion(pkl_path, n_steps=None, flog=None):
         torque = (pd_target - dof_pos) * env.stiffness - dof_vel * env.damping
         torque = np.clip(torque, -env.torque_limits, env.torque_limits)
         d.ctrl = torque; mujoco.mj_step(m, d)
+        mujoco.mj_forward(m, d)  # sync xpos/contacts to the just-integrated qpos (mj_step leaves them one substep stale — same fix as G1Sim.pd_step); the next logged fz/foot_z then match qpos
     return np.array(hs), m, nom_h, np.array(fzs)
 
 if sys.argv[1] == "sanity":

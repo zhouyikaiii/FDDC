@@ -2,7 +2,7 @@
 com_rel_obs zeroed (baseline does not compute it) -> only take metrics not depending on it (xcom/jerk/track/hop/fall/ttb)."""
 import os, numpy as np, metrics as M
 MK = ["success", "success_sustained", "track_fail", "fell", "hop_count", "swing_touched", "time_to_fall",
-      "xcom_margin_ap_min", "xcom_margin_ml_min", "com_margin_ap_min", "com_margin_ml_min", "xcom_margin_viol_dur", "xcom_min_ttb", "xcom_low_ttb_events",
+      "xcom_margin_ap_min", "xcom_margin_ml_min", "xcom_margin_ap_mean", "xcom_margin_ml_mean", "com_margin_ap_mean", "com_margin_ml_mean", "com_margin_ap_min", "com_margin_ml_min", "xcom_margin_viol_dur", "xcom_min_ttb", "xcom_low_ttb_events",
       "slippage_mm_s", "action_jerk_rms", "dof_vel_jerk_rms", "track_Epos", "track_Evel", "track_Eacc"]
 _KEYS = ["t", "base_pos", "base_quat", "base_angvel", "base_linvel", "qvel", "fz_l", "fz_r",
          "foot_l_pos", "foot_r_pos", "foot_l_z", "foot_r_z", "foot_l_quat", "foot_r_quat",

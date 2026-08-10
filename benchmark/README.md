@@ -1,9 +1,9 @@
-# The FDDC single-leg-balance benchmark — method-agnostic scoring
+# The DDC single-leg-balance benchmark — method-agnostic scoring
 
-FDDC's benchmark is **method-agnostic**: every policy is scored on the **same motion set** by the
+DDC's benchmark is **method-agnostic**: every policy is scored on the **same motion set** by the
 **same outcome metric**, judged from the robot's **true physical state** — not from the policy's own
 reference or reward. Where a method's observation and simulator can be cleanly reused, it runs in the
-shared FDDC G1 MuJoCo plant; where they are tightly coupled to the method's own deployment stack, it runs
+shared DDC G1 MuJoCo plant; where they are tightly coupled to the method's own deployment stack, it runs
 in that method's **native MuJoCo deployment harness** (more faithful than force-porting it). This
 directory documents both, and how the paper's eight baselines were scored (Table 1).
 
@@ -18,7 +18,7 @@ directory documents both, and how the paper's eight baselines were scored (Table
 
 **Physics plant — shared for some, native for others:**
 
-- **Shared FDDC G1 plant** (`eval/wbt_rollout.py` `G1Sim`, 50 Hz PD): **ProtoMotions, MOSAIC, SONIC,
+- **Shared DDC G1 plant** (`eval/wbt_rollout.py` `G1Sim`, 50 Hz PD): **ProtoMotions, MOSAIC, SONIC,
   HoloMotion** — their observation/sim reuse the shared kernel.
 - **The method's own upstream MuJoCo** (its model / PD / timestep / sim wrapper): **GMT, TWIST,
   OmniXtreme, Humanoid-GPT** — their obs/sim are tightly coupled, so we run their native deployment
@@ -55,7 +55,7 @@ PYTHONPATH=../../eval  GMT_REPO=/path/to/GMT  GMT_WEIGHTS=$GMT_REPO/assets/pretr
 
 ## Scoring your own policy
 
-The simplest worked example is the FDDC path itself: `../eval/run_eval.py` + `../eval/fast_policy.py`
+The simplest worked example is the DDC path itself: `../eval/run_eval.py` + `../eval/fast_policy.py`
 score a policy that already speaks the WBT observation. To score a policy with a **different**
 observation / action space, write an adapter following the pattern in `baselines/`:
 

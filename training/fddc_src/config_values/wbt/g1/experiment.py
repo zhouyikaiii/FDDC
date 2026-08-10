@@ -1,7 +1,7 @@
 # ---------------------------------------------------------------------------------------------------
 # Modified from the Holosoma framework (Amazon FAR): https://github.com/amazon-far/holosoma
 # Copyright Amazon.com, Inc. or its affiliates. Licensed under the Apache License, Version 2.0.
-# This file was CHANGED for FDDC: it carries the deployable support-relative dynamic-CoM observation
+# This file was CHANGED for DDC: it carries the deployable support-relative dynamic-CoM observation
 # and/or the human-science balance reward library and its config (see training/TRAINING.md).
 # The Apache-2.0 license text is in the repository LICENSE; attribution is in training/NOTICE.
 # ---------------------------------------------------------------------------------------------------

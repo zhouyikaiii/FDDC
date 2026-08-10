@@ -1,4 +1,4 @@
-# FDDC single-leg-balance benchmark — evaluation dependencies.
+# DDC single-leg-balance benchmark — evaluation dependencies.
 # The policy runs on CPU (numpy); a CPU-only torch build is sufficient.
 # Versions in parentheses are what the release was validated against.
 numpy>=1.24        # (tested 1.26.4)

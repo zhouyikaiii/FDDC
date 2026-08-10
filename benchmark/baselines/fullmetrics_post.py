@@ -5,7 +5,7 @@ kinematics. The action channel uses the dof positions (qpos[7:]), so action_jerk
 position-jerk proxy (noted in the paper); dof_vel_jerk uses the true qvel and is directly comparable."""
 import numpy as np, mujoco, metrics as M
 MK = ["success", "success_sustained", "track_fail", "fell", "hop_count", "swing_touched", "time_to_fall",
-      "xcom_margin_ap_min", "xcom_margin_ml_min", "com_margin_ap_min", "com_margin_ml_min", "xcom_margin_viol_dur", "xcom_min_ttb", "xcom_low_ttb_events",
+      "xcom_margin_ap_min", "xcom_margin_ml_min", "xcom_margin_ap_mean", "xcom_margin_ml_mean", "com_margin_ap_mean", "com_margin_ml_mean", "com_margin_ap_min", "com_margin_ml_min", "xcom_margin_viol_dur", "xcom_min_ttb", "xcom_low_ttb_events",
       "slippage_mm_s", "action_jerk_rms", "dof_vel_jerk_rms", "track_Epos", "track_Evel", "track_Eacc"]
 
 def _xyzw(q):

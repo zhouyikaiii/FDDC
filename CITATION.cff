@@ -1,6 +1,6 @@
 cff-version: 1.2.0
-message: "If you use FDDC — the policy, the sim2sim benchmark, or the stratified motion split — please cite the paper below (and the AMS dataset it derives from; see data/NOTICE)."
-title: "First Deployable Dynamic-CoM: A Unified Policy and Method-Agnostic Benchmark for Humanoid Single-Leg Balance"
+message: "If you use DDC — the policy, the sim2sim benchmark, or the stratified motion split — please cite the paper below (and the AMS dataset it derives from; see data/NOTICE)."
+title: "A Change of Frame Makes Balance Observable: Distillation-Free Humanoid Single-Leg Stance"
 authors:
   - family-names: Zhou
     given-names: Yikai
@@ -26,7 +26,7 @@ authors:
 url: "https://arxiv.org/abs/2608.00500"
 preferred-citation:
   type: article
-  title: "First Deployable Dynamic-CoM: A Unified Policy and Method-Agnostic Benchmark for Humanoid Single-Leg Balance"
+  title: "A Change of Frame Makes Balance Observable: Distillation-Free Humanoid Single-Leg Stance"
   authors:
     - family-names: Zhou
       given-names: Yikai

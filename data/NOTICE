@@ -1,4 +1,4 @@
-FDDC single-leg-balance motions — data/data_stratified_900/
+DDC single-leg-balance motions — data/data_stratified_900/
 ===========================================================
 
 These motion clips (sample_<support>_<id>_mj.npz; Unitree G1 29-DoF, 50 Hz, 249 frames) are a
@@ -16,9 +16,9 @@ Unitree G1 29-DoF MuJoCo model, and (2) distilled a compact, difficulty-stratifi
 900 clips — a 3x3 grid over support-leg squat depth (pelvis height) x swing-foot absolute height,
 100 clips per class (50/50 left/right), split 720 train / 90 val / 90 test balanced across classes
 and support sides (seed 42). Per-clip class / bin / support / split labels are in
-data_stratified_900/dataset_info.json (and manifest.csv). See the FDDC paper, Appendix E.
+data_stratified_900/dataset_info.json (and manifest.csv). See the DDC paper, Appendix E.
 
-These modifications (retargeting + distillation) were made for FDDC by the FDDC authors in July 2026,
+These modifications (retargeting + distillation) were made for DDC by the DDC authors in July 2026,
 stated here as required for a GPL-3.0 derivative (GPL-3.0 §5(a): a modified work carries prominent
 notices stating that it was changed, and the date).
 

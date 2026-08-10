@@ -1,4 +1,4 @@
-# Data — FDDC stratified single-leg-balance motions
+# Data — DDC stratified single-leg-balance motions
 
 The **900 motion clips** (`sample_<support>_<id>_mj.npz`; Unitree G1 29-DoF, 50 Hz, 249 frames) are
 hosted on the **HuggingFace Hub** —

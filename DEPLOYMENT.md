@@ -1,6 +1,6 @@
-# Deploying FDDC on a real Unitree G1
+# Deploying DDC on a real Unitree G1
 
-FDDC runs **directly** on a physical Unitree G1 (29-DoF) — the *same* actor scored in the benchmark, with
+DDC runs **directly** on a physical Unitree G1 (29-DoF) — the *same* actor scored in the benchmark, with
 **no teacher–student distillation and no separate student network**. This document is the actual
 deployment **recipe and commands** we use, plus the **safety caveats**.
 
@@ -26,12 +26,15 @@ Two processes (two terminals / two conda envs — a MuJoCo-sim env and an infere
 
 ```bash
 # Terminal A — simulator.  WBT_INIT_MOTION_NPZ must point at the SAME motion as the ONNX,
-# otherwise the robot starts from the wrong pose.  WBT_IMU_TYPE=pelvis (see IMU note below).
-WBT_IMU_TYPE=pelvis  WBT_INIT_MOTION_NPZ=<motion>.npz \
+# otherwise the robot starts from the wrong pose.
+WBT_INIT_MOTION_NPZ=<motion>.npz \
     python src/holosoma/holosoma/run_sim.py robot:g1-29dof
 
-# Terminal B — controller (run at the same time)
-python src/holosoma_inference/holosoma_inference/run_policy.py inference:g1-29dof-wbt \
+# Terminal B — controller (run at the same time).  WBT_IMU_TYPE=pelvis is read by THIS (controller)
+# process — it builds the observation from the IMU. It selects the SDK's reported IMU frame, NOT the
+# sensor's physical mount location (see the IMU note below).
+WBT_IMU_TYPE=pelvis \
+    python src/holosoma_inference/holosoma_inference/run_policy.py inference:g1-29dof-wbt \
     --task.model-path <model_step_motion>.onnx --task.rl-rate 50
 ```
 
@@ -43,7 +46,8 @@ Only the controller runs; the real robot supplies `LowState` over the network in
 A per-motion ONNX bakes the motion in, so no `WBT_INIT_MOTION_NPZ` is needed.
 
 ```bash
-python src/holosoma_inference/holosoma_inference/run_policy.py inference:g1-29dof-wbt \
+WBT_IMU_TYPE=pelvis \
+    python src/holosoma_inference/holosoma_inference/run_policy.py inference:g1-29dof-wbt \
     --task.model-path <model_step_motion>.onnx --task.rl-rate 50 \
     --task.interface <robot-DDS-network-interface> --task.use-joystick
 ```
@@ -77,8 +81,11 @@ enabled (set it `True`, with per-joint `dof_pos_lower/upper` in the ONNX metadat
 - [ ] **Gantry / fall protection** up; start slow and small-amplitude, confirm the stance + swing-foot
       phase, then release.
 - [ ] **Emergency stop ready** — joystick **L1+R1** (KILL); and `--task.use-joystick` must be set.
-- [ ] **IMU frame** — default `WBT_IMU_TYPE=pelvis`; if your robot's IMU is in the torso, set it to
-      `"torso"` on both sides (validate in sim first — a wrong IMU frame corrupts the balance estimate).
+- [ ] **IMU frame** — the observation assumes base orientation + angular velocity in the **pelvis frame**
+      (`WBT_IMU_TYPE=pelvis`). This is the *frame the SDK reports the IMU orientation/gyro in*, **not** where
+      the sensor is physically mounted. If your SDK/robot reports the IMU in a different frame (e.g. torso),
+      convert it to the pelvis frame before building the observation — a wrong IMU frame corrupts the balance
+      estimate. Validate in sim2sim first.
 - [ ] Confirm `--task.interface` is the robot's DDS network interface.
 - [ ] A dry run in **sim2sim** (above) first.
 

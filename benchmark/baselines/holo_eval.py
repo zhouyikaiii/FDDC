@@ -3,7 +3,7 @@ In hsmujoco env (warp+torch+onnxruntime+mujoco+wbt_rollout). Usage: sanity | run
 import os, sys, json, glob, re, time
 import numpy as np, torch, onnx, onnxruntime as ort
 os.environ.setdefault("WBT_ORT_THREADS", "1")
-_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))  # FDDC release repo root
+_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))  # DDC release repo root
 sys.path.insert(0, os.environ["HOLO_REPO"])
 import warp as wp
 wp.init()
@@ -131,7 +131,7 @@ def rollout_metrics(mid):
         com_rel = W.build_obs(sim, _dummy, motion, np.zeros(29, np.float32))[-4:].copy()
         tilt = float(np.arccos(np.clip(-sim.projected_gravity_base()[2], -1, 1)))
         lp, lv, lz = sim.foot_state(sim.lfoot); rp, rv, rz = sim.foot_state(sim.rfoot)
-        com, comv = sim.com_state(); cur_h = float(sim.data.qpos[2])
+        com = sim.com_true(); comv = (com - log["com"][-1]) * W.CONTROL_HZ if log["com"] else np.zeros(3); cur_h = float(sim.data.qpos[2])  # true xipos CoM + finite-diff (unified); obs com_rel above stays proxy
         fell = fell or (cur_h < 0.5 * nominal_h) or (tilt > 1.0)
         log["t"].append(t / W.CONTROL_HZ); log["base_pos"].append(sim.data.qpos[0:3].copy())
         log["base_quat"].append(sim.base_quat_xyzw()); log["base_angvel"].append(sim.base_ang_vel_base())
@@ -155,7 +155,7 @@ if sys.argv[1] == "runm":
     mots = sorted(re.sub(r"^sample_|_mj\.npz$", "", os.path.basename(p)) for p in glob.glob(motion_dir + "/sample_*_mj.npz"))
     my = mots[shard::nsh]; res = {}; t0 = time.time()
     _MK = ["success", "success_sustained", "track_fail", "fell", "hop_count", "swing_touched", "time_to_fall", "xcom_margin_ap_min",
-           "xcom_margin_ml_min", "com_margin_ap_min", "com_margin_ml_min", "xcom_margin_viol_dur", "xcom_min_ttb", "xcom_low_ttb_events", "slippage_mm_s", "action_jerk_rms", "dof_vel_jerk_rms",
+           "xcom_margin_ml_min", "xcom_margin_ap_mean", "xcom_margin_ml_mean", "com_margin_ap_mean", "com_margin_ml_mean", "com_margin_ap_min", "com_margin_ml_min", "xcom_margin_viol_dur", "xcom_min_ttb", "xcom_low_ttb_events", "slippage_mm_s", "action_jerk_rms", "dof_vel_jerk_rms",
            "track_Epos", "track_Evel", "track_Eacc"]
     for mid in my:
         try:

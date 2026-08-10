@@ -1,4 +1,4 @@
-"""Run the FDDC actor directly from a .pt (numpy) — no IsaacSim, no ONNX. Bit-exact with the IsaacSim
+"""Run the DDC actor directly from a .pt (numpy) — no IsaacSim, no ONNX. Bit-exact with the IsaacSim
 ONNX export. The robot config (dof_names / kp / kd / PD action_scale / default pose /
 joint limits) is read from a static robot_config.json — these are Unitree-G1 constants, identical across
 every training run — so the ONLY per-policy artifact needed is the .pt."""
@@ -22,11 +22,11 @@ def _obs_slice(obs, dim):
 
 
 class FastPolicy:
-    """FDDC deployable actor from a .pt + robot_config.json. Drop-in for wbt_rollout (exposes .infer,
+    """DDC deployable actor from a .pt + robot_config.json. Drop-in for wbt_rollout (exposes .infer,
     .dof_names, .kp, .kd, .action_scale, .default_dof, .dof_pos_lower/upper, .num_dofs, .obs_dim)."""
 
     def __init__(self, pt_path, robot_config):
-        d = torch.load(pt_path, map_location="cpu", weights_only=False)
+        d = torch.load(pt_path, map_location="cpu", weights_only=True)
         sd = d["actor_state_dict"]; norm = d["obs_normalizer_state"]
         f = lambda x: x.detach().cpu().numpy().astype(np.float64)
         # normalization divisor = std + 0.01 (RunningMeanStd eps; the raw std is 0 on the constant dims,
