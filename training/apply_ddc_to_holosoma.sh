@@ -2,17 +2,17 @@
 # Overlay the DDC-specific files onto a pinned Holosoma checkout, with verification.
 # Usage: bash apply_ddc_to_holosoma.sh <path-to-holosoma-checkout>
 #   - checks the checkout is at the exact upstream commit DDC was built on
-#   - checks the DDC files here match their recorded checksums (fddc_src/SHA256SUMS)
+#   - checks the DDC files here match their recorded checksums (ddc_src/SHA256SUMS)
 #   - copies them into src/holosoma/holosoma/<same relative path>, replacing upstream
 set -euo pipefail
 PIN=5b61d5768bc8e44710e2983db6263e174193981c   # amazon-far/holosoma, 2026-07-24 (paper Table 6 stack)
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SRC="$HERE/fddc_src"
+SRC="$HERE/ddc_src"
 HOLO="${1:?usage: apply_ddc_to_holosoma.sh <path-to-holosoma-checkout> [--force]}"
 FORCE="${2:-}"   # --force = overlay even if the checkout is not at the pinned commit
 DEST="$HOLO/src/holosoma/holosoma"
 
-echo "== 1. verify DDC files here match fddc_src/SHA256SUMS =="
+echo "== 1. verify DDC files here match ddc_src/SHA256SUMS =="
 ( cd "$SRC" && sha256sum -c SHA256SUMS ) || { echo "FAIL: local DDC files altered/corrupt"; exit 1; }
 
 echo "== 2. verify the Holosoma checkout is at the pinned commit =="

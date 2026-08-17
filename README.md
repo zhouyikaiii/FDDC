@@ -127,7 +127,7 @@ opensource_release/
 │  ├─ model_0262000.pt  deployed DDC checkpoint
 │  └─ robot_config.json G1 constants (dof_names, kp, kd, action_scale, default pose, joint limits)
 ├─ robot/g1_29dof/      g1_29dof.xml + meshes/ + NOTICE   (Unitree-derived plant)
-├─ training/            DDC method on Holosoma: fddc_src/ (obs + reward + config) + train_full.sh + TRAINING.md + NOTICE
+├─ training/            DDC method on Holosoma: ddc_src/ (obs + reward + config) + train_full.sh + TRAINING.md + NOTICE
 └─ data/
    ├─ data_stratified_900/{train,val,test}/  sample_*_mj.npz  (+ dataset_info.json, manifest.csv)
    ├─ LICENSE           GPL-3.0 (motions; derived from AMS)
@@ -146,7 +146,7 @@ This project **mixes licenses** — please read before redistributing:
   full license is in `robot/g1_29dof/LICENSE`, attribution + stated modifications in
   `robot/g1_29dof/NOTICE`). Redistributed under BSD-3-Clause; the `<actuator>` / visual-geom edits are
   Holosoma's (Apache-2.0).
-- **Training code** (`training/fddc_src/`, `training/train_full.sh`) — **Apache-2.0**, modified from the
+- **Training code** (`training/ddc_src/`, `training/train_full.sh`) — **Apache-2.0**, modified from the
   public **Holosoma** framework (Amazon FAR, Apache-2.0); the changes we made are stated in
   `training/NOTICE`. It is a small readable subset, not a redistribution of the whole framework.
 

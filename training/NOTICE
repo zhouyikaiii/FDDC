@@ -1,7 +1,7 @@
 DDC training reference — training/
 ===================================
 
-The files under training/fddc_src/ (and train_full.sh) are MODIFIED from the Holosoma framework:
+The files under training/ddc_src/ (and train_full.sh) are MODIFIED from the Holosoma framework:
 
     Holosoma — Amazon FAR.  https://github.com/amazon-far/holosoma
     Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
