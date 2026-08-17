@@ -2,7 +2,7 @@
 
 The **900 motion clips** (`sample_<support>_<id>_mj.npz`; Unitree G1 29-DoF, 50 Hz, 249 frames) are
 hosted on the **HuggingFace Hub** —
-[zhouyikai/FDDC-single-leg-balance](https://huggingface.co/datasets/zhouyikai/FDDC-single-leg-balance) —
+[zhouyikai/DDC-single-leg-balance](https://huggingface.co/datasets/zhouyikai/DDC-single-leg-balance) —
 not in this git repo (they are ~645 MB). Only the small metadata
 (`data_stratified_900/dataset_info.json`, `manifest.csv`, `*_list.txt`) is tracked here.
 
